@@ -1,0 +1,5 @@
+* text=auto eol=lf
+*.sol linguist-language=Solidity
+apps/web/shared/abis.ts linguist-generated=true
+apps/web/shared/deployments.ts linguist-generated=true
+apps/web/package-lock.json linguist-generated=true

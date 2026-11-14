@@ -1,0 +1,515 @@
+:root {
+  --bg: #f6f1e4;
+  --surface: #fffdf7;
+  --surface-2: #f1ead8;
+  --ink: #1d2a1f;
+  --muted: #66705f;
+  --line: #e2d9c2;
+  --green: #2f5d3a;
+  --green-ink: #f6f1e4;
+  --gold: #d9a521;
+  --gold-soft: #f5e3a8;
+  --danger: #a63d2f;
+  --ok: #2f7a45;
+  --radius: 14px;
+  --shadow: 0 1px 0 rgba(29, 42, 31, 0.04), 0 8px 24px -16px rgba(29, 42, 31, 0.25);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121812;
+    --surface: #1a221b;
+    --surface-2: #222c23;
+    --ink: #ece6d6;
+    --muted: #9aa392;
+    --line: #2e3a2f;
+    --green: #8fc29b;
+    --green-ink: #121812;
+    --gold: #e7bb46;
+    --gold-soft: #3b321a;
+    --danger: #e5826f;
+    --ok: #7ccf94;
+    --shadow: 0 8px 24px -16px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+h1 {
+  font-size: 26px;
+}
+
+h2 {
+  font-size: 20px;
+}
+
+p {
+  margin: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.mono,
+code,
+pre {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ------------------------------------------------------------ layout */
+
+.app {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.brand {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.brand__mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--gold-soft) 0 18%, transparent 19%),
+    conic-gradient(from 0deg, var(--green) 0 12.5%, var(--gold) 0 25%, var(--green) 0 37.5%, var(--gold) 0 50%,
+      var(--green) 0 62.5%, var(--gold) 0 75%, var(--green) 0 87.5%, var(--gold) 0);
+  box-shadow: inset 0 0 0 3px var(--surface);
+  outline: 2px solid var(--green);
+}
+
+.wallet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.wallet > div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.wallet dt {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wallet dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.col {
+  display: grid;
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ------------------------------------------------------------- panels */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+}
+
+.panel__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.panel__head p {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+.stat-chip {
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.footnote,
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* ------------------------------------------------------------ puzzles */
+
+.puzzles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.puzzle {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.puzzle--solved {
+  background: var(--surface-2);
+}
+
+.puzzle__top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: start;
+}
+
+.puzzle__num {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--muted);
+  font-size: 13px;
+  padding-top: 2px;
+}
+
+.puzzle__done {
+  color: var(--ok);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.reward {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--gold-soft);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.feedback {
+  color: var(--danger);
+  font-size: 13px;
+}
+
+/* -------------------------------------------------------------- forms */
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.inline-form input {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+input,
+select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  border: 1px solid var(--green);
+  background: var(--green);
+  color: var(--green-ink);
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--green);
+}
+
+button.small {
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------- bank */
+
+.balance-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.balance-pair > div {
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: grid;
+}
+
+.balance-pair strong {
+  font-family: Fraunces, Georgia, serif;
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ------------------------------------------------------------- tables */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 8px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.action {
+  text-align: right;
+}
+
+tr.mine td {
+  background: var(--gold-soft);
+}
+
+.addr {
+  display: block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.empty {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.proceeds {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+}
+
+/* ----------------------------------------------------------- activity */
+
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.activity li {
+  border-left: 3px solid var(--line);
+  padding: 2px 0 2px 12px;
+  font-size: 14px;
+}
+
+.activity__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.status {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status--pending {
+  color: var(--gold);
+}
+
+.status--done {
+  color: var(--ok);
+}
+
+.status--failed {
+  color: var(--danger);
+}
+
+.tx {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.tx code {
+  font-size: 12px;
+}
+
+.error {
+  font-size: 13px;
+  color: var(--danger);
+}
+
+.busy {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ink);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 10;
+}
+
+/* -------------------------------------------------------------- setup */
+
+.setup {
+  max-width: 640px;
+  margin: 80px auto;
+  padding: 0 16px;
+  display: grid;
+  gap: 14px;
+}
+
+.setup pre {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  overflow-x: auto;
+  font-size: 13px;
+}
+
+.game-link {
+  font-weight: 600;
+  color: var(--green);
+  text-decoration: none;
+  margin-left: auto;
+  margin-right: 20px;
+}

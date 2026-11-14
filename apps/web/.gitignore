@@ -1,0 +1,6 @@
+# See the repo root .gitignore. shared/abis.ts and shared/deployments.ts are generated
+# but COMMITTED on purpose: Vercel builds without Foundry.
+node_modules/
+dist/
+playtest/
+.vercel/

@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------- secrets
+# Keys and service credentials live in .env files (local) and Vercel env vars (prod), never git.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.vercel/
+
+# ---------------------------------------------------------------- contracts (Foundry)
+contracts/cache/
+contracts/out/
+# Local anvil broadcasts are noise; testnet broadcasts (84532/) are kept as a deploy record.
+contracts/broadcast/*/31337/
+contracts/broadcast/**/dry-run/
+
+# ---------------------------------------------------------------- web
+node_modules/
+apps/web/dist/
+apps/web/playtest/
+apps/web/test-results/
+
+# ---------------------------------------------------------------- supabase CLI
+supabase/.temp/
+supabase/.branches/
+
+# ---------------------------------------------------------------- misc
+.logs/
+*.log
+.DS_Store
+Thumbs.db
