@@ -47,6 +47,9 @@ alter table public.swings       enable row level security;
 alter table public.faucet_drips enable row level security;
 alter table public.meals        enable row level security;
 revoke all on public.players, public.swings, public.faucet_drips, public.meals from anon, authenticated;
+-- Explicit, rather than relying on the project's default privileges (newer projects grant less).
+grant select, insert, update, delete on public.players, public.swings, public.faucet_drips, public.meals to service_role;
+grant usage, select on sequence public.swings_id_seq, public.faucet_drips_id_seq to service_role;
 
 -- ------------------------------------------------------------------ functions
 -- Stamina regenerates linearly: current = min(max, stored + seconds_since * regen).
