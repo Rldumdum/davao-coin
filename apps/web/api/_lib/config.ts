@@ -31,8 +31,11 @@ const anvilKey = (index: number): Hex => {
   return `0x${Buffer.from(key!).toString('hex')}`;
 };
 
+/** Env values pasted into dashboards or piped from shells often carry stray whitespace/newlines. */
+const env = (name: string): string | undefined => process.env[name]?.trim() || undefined;
+
 function required(name: string): string {
-  const v = process.env[name];
+  const v = env(name);
   if (!v) throw new Error(`Missing environment variable ${name}. See apps/web/.env.example.`);
   return v;
 }
@@ -41,28 +44,28 @@ let cached: ServerConfig | null = null;
 
 export function loadConfig(): ServerConfig {
   if (cached) return cached;
-  const network = networkByName(process.env.NETWORK ?? process.env.VITE_NETWORK);
+  const network = networkByName(env('NETWORK') ?? env('VITE_NETWORK'));
   const local = network.name === 'local';
 
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = env('SUPABASE_URL');
+  const supabaseKey = env('SUPABASE_SERVICE_ROLE_KEY');
   if (!local && !(supabaseUrl && supabaseKey)) {
     throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required outside the local network.');
   }
 
   cached = {
     network,
-    rpcUrl: process.env.RPC_URL ?? network.rpcUrl,
-    voucherSignerKey: (local ? (process.env.VOUCHER_SIGNER_KEY ?? anvilKey(9)) : required('VOUCHER_SIGNER_KEY')) as Hex,
-    faucetKey: (local ? (process.env.FAUCET_PRIVATE_KEY ?? anvilKey(0)) : required('FAUCET_PRIVATE_KEY')) as Hex,
-    dripWei: BigInt(process.env.FAUCET_DRIP_WEI ?? (local ? '50000000000000000' : '200000000000000')), // 0.05 / 0.0002 ETH
+    rpcUrl: env('RPC_URL') ?? network.rpcUrl,
+    voucherSignerKey: (local ? (env('VOUCHER_SIGNER_KEY') ?? anvilKey(9)) : required('VOUCHER_SIGNER_KEY')) as Hex,
+    faucetKey: (local ? (env('FAUCET_PRIVATE_KEY') ?? anvilKey(0)) : required('FAUCET_PRIVATE_KEY')) as Hex,
+    dripWei: BigInt(env('FAUCET_DRIP_WEI') ?? (local ? '50000000000000000' : '200000000000000')), // 0.05 / 0.0002 ETH
     supabase: supabaseUrl && supabaseKey ? { url: supabaseUrl, serviceRoleKey: supabaseKey } : null,
-    ipHashSalt: local ? (process.env.IP_HASH_SALT ?? 'local-dev') : required('IP_HASH_SALT'),
+    ipHashSalt: local ? (env('IP_HASH_SALT') ?? 'local-dev') : required('IP_HASH_SALT'),
     limits: {
-      swingsPerIpPerMinute: Number(process.env.LIMIT_SWINGS_PER_IP_PER_MINUTE ?? 40),
-      swingsPerAddressPerDay: Number(process.env.LIMIT_SWINGS_PER_ADDRESS_PER_DAY ?? 3000),
-      dripsPerIpPerDay: Number(process.env.LIMIT_DRIPS_PER_IP_PER_DAY ?? 5),
-      dripsPerDay: Number(process.env.LIMIT_DRIPS_PER_DAY ?? 300),
+      swingsPerIpPerMinute: Number(env('LIMIT_SWINGS_PER_IP_PER_MINUTE') ?? 40),
+      swingsPerAddressPerDay: Number(env('LIMIT_SWINGS_PER_ADDRESS_PER_DAY') ?? 3000),
+      dripsPerIpPerDay: Number(env('LIMIT_DRIPS_PER_IP_PER_DAY') ?? 5),
+      dripsPerDay: Number(env('LIMIT_DRIPS_PER_DAY') ?? 300),
     },
   };
   return cached;

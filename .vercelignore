@@ -1,0 +1,10 @@
+# Vercel only builds apps/web; don't upload the Foundry toolchain or local artifacts.
+contracts/lib/
+contracts/out/
+contracts/cache/
+contracts/broadcast/
+**/node_modules/
+apps/web/dist/
+apps/web/playtest/
+.env
+.env.*

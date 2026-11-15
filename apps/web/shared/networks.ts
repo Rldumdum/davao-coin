@@ -29,7 +29,7 @@ export const NETWORKS: Record<NetworkName, Network> = {
 };
 
 export function networkByName(name: string | undefined): Network {
-  const key = (name ?? 'local') as NetworkName;
+  const key = (name?.trim() || 'local') as NetworkName;
   const network = NETWORKS[key];
   if (!network) throw new Error(`Unknown network "${name}". Use one of: ${Object.keys(NETWORKS).join(', ')}`);
   return network;
