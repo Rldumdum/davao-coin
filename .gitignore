@@ -29,3 +29,6 @@ supabase/.branches/
 *.log
 .DS_Store
 Thumbs.db
+
+# Foundry temp lock files
+*.recovery.lock
