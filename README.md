@@ -4,6 +4,9 @@ An ERC-20 memecoin, a small economy around it, and **Barangay Durian**, a 3D bro
 every swing, bite and trade is a transaction. Built to learn smart contract engineering with
 Foundry, OpenZeppelin and viem. Runs on a local chain (anvil) or Base Sepolia. Testnets only, never mainnet.
 
+**Play it: https://davao-coin.vercel.app** (Base Sepolia testnet; no wallet or crypto needed, your
+browser gets a session wallet and the game's faucet pays its gas).
+
 | | |
 |---|---|
 | Name | Davao Coin |
@@ -48,6 +51,22 @@ supabase/migrations/       game server tables + atomic stamina functions
 | `DavaoItems` | Every game item: ores, fruit, pickaxes | ERC-1155 multi-token, roles (AccessControl), burning |
 | `DurianMine` | Swing at a spot with a server-signed voucher, get DURIAN + ore | EIP-712 signatures, replay protection, per-player cooldowns |
 | `Merchant` | NPC trader: swaps bundles of DURIAN/ETH/items in one tx | Atomic swaps, bid/ask spreads, rounding in the house's favor |
+
+### Deployed on Base Sepolia (chain 84532)
+
+| Contract | Address |
+|---|---|
+| DavaoCoin | [0xe1bf1382D539976073B55805417890143242E33b](https://sepolia.basescan.org/address/0xe1bf1382D539976073B55805417890143242E33b) |
+| DavaoItems | [0xf0374C6B0D8b7850c439dE3B68CD914792838FDc](https://sepolia.basescan.org/address/0xf0374C6B0D8b7850c439dE3B68CD914792838FDc) |
+| DurianMine | [0xE3aFb2125F44c60f22f546294071344869734461](https://sepolia.basescan.org/address/0xE3aFb2125F44c60f22f546294071344869734461) |
+| Merchant: Aling Nena | [0xe2Be65c99719cc3E81C6556a66fCc36D3Fc7DCC9](https://sepolia.basescan.org/address/0xe2Be65c99719cc3E81C6556a66fCc36D3Fc7DCC9) |
+| Merchant: Mang Berto | [0xF2546173C08935c1b0500f01a4e1ecB71a7385A5](https://sepolia.basescan.org/address/0xF2546173C08935c1b0500f01a4e1ecB71a7385A5) |
+| Merchant: Kuya Jun | [0x5d3F1A3A5E8c562E4808883546524B1094224010](https://sepolia.basescan.org/address/0x5d3F1A3A5E8c562E4808883546524B1094224010) |
+| DavaoBank | [0xE0C7f1F1289D08aE797a890eD1C3964DE5B9D45F](https://sepolia.basescan.org/address/0xE0C7f1F1289D08aE797a890eD1C3964DE5B9D45F) |
+| DurianMarket | [0xB5Ae8ADc94A8695424c6c1159321DDe3537969cC](https://sepolia.basescan.org/address/0xB5Ae8ADc94A8695424c6c1159321DDe3537969cC) |
+| PuzzleRewards | [0xab96b91392Fd04d207918e9630BC7a1038bB6c3A](https://sepolia.basescan.org/address/0xab96b91392Fd04d207918e9630BC7a1038bB6c3A) |
+
+Source isn't verified on Basescan yet (needs an Etherscan API key; see the deploy section).
 
 ## How the game is wired
 
@@ -155,7 +174,7 @@ CI (`.github/workflows/test.yml`) runs all of it, and fails if `shared/` is stal
 2. ~~Local deployment, bank, puzzles, market, UI~~
 3. ~~3D game: items (ERC-1155), mining, NPC merchants~~
 4. ~~Server-signed EIP-712 mining vouchers, session wallets, game API, Supabase~~
-5. **Testnet launch** on Base Sepolia + Vercel  <- you are here
+5. ~~**Testnet launch** on Base Sepolia + Vercel~~ (live at https://davao-coin.vercel.app)  <- you are here
 6. Fix the puzzles' front-running (commit-reveal, or vouchers like the mine)
 7. Optional real wallet (wagmi + MetaMask) to withdraw winnings from a session wallet
 8. Airdrop claim with a Merkle tree

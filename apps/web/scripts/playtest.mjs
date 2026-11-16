@@ -145,8 +145,20 @@ await page.getByRole('button', { name: 'Confirm trade' }).click();
 await txWait(3500);
 await page.keyboard.press('Escape');
 await wait(300);
+// Eating needs room in the stamina bar. On slow networks it refills during the trades,
+// so take one more swing (copper vein #1, not mined yet) before eating.
+if ((await page.evaluate(() => window.__game.stamina())) >= 99) {
+  const mined = await page.evaluate(() => window.__game.state().timesMined);
+  await tp(-4, -23.4, Math.PI);
+  await page.keyboard.press('e');
+  await ff(1.5);
+  await minedAtLeast(mined + 1);
+  await tp(13.6, -6, 1.98);
+}
+const beforeEat = await page.evaluate(() => Math.round(window.__game.stamina()));
 await page.keyboard.press('1');
-await txWait(2500);
+await page.waitForFunction((b) => window.__game.stamina() > b + 10, beforeEat, { timeout: 30000 * SLOW }).catch(() => {});
+await txWait(1000);
 await page.keyboard.press('i');
 await wait(500);
 await shot('13-bag', 'bag open after eating');
