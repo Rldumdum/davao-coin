@@ -135,7 +135,7 @@ export function GameScreen() {
             <StatusBar address={you.address} xp={s.timesMined} stamina={stamina.value} pickaxeBonus={s.pickaxeBonus} />
           </div>
           <div className="hud-top-right">
-            <Purse durian={s.durian} eth={s.eth} block={s.blockNumber} flash={chain.balanceFlash} />
+            <Purse durian={s.durian} eth={s.eth} block={s.blockNumber} flash={chain.balanceFlash} stale={chain.stale} />
             <Minimap game={game} />
           </div>
           <div className="hud-bottom-left">

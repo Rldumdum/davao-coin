@@ -14,7 +14,15 @@ import { addressesFor, networkByName, type Addresses } from '../../shared/networ
 
 export const network = networkByName(import.meta.env.VITE_NETWORK);
 export const RPC_URL: string = import.meta.env.VITE_RPC_URL ?? network.rpcUrl;
-const transport = http(RPC_URL);
+// Public RPCs (sepolia.base.org) rate-limit hard, and one game poll is ~40 reads. Two layers of
+// batching keep that to about one HTTP request per poll:
+//  - JSON-RPC batching: requests made in the same few milliseconds share one HTTP request.
+//  - Multicall3 (below): concurrent contract reads become ONE eth_call to the Multicall3 contract.
+const transport = http(RPC_URL, { batch: { wait: 16 }, retryCount: 5, retryDelay: 500 });
+/** Multicall3 is deployed on Base Sepolia (viem knows its address); local anvil doesn't have it. */
+const multicall = network.chain.contracts?.multicall3 ? { multicall: { wait: 16 } } : undefined;
+/** How often to re-read the chain. Base makes a block every ~2 s; anvil mines instantly. */
+export const POLL_MS = network.name === 'local' ? 2500 : 5000;
 
 const deployed = addressesFor(network.chain.id);
 /** False when nothing is deployed (and synced) for this network yet; the UI shows setup help. */
@@ -49,7 +57,7 @@ export function exportSessionKey(): string | null {
   }
 }
 
-export const publicClient = createPublicClient({ chain: network.chain, transport });
+export const publicClient = createPublicClient({ chain: network.chain, transport, batch: multicall, pollingInterval: 2000 });
 export const walletClient = createWalletClient({ account: you, chain: network.chain, transport });
 
 /* ---------------------------------------------------------- sample people */

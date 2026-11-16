@@ -1115,3 +1115,10 @@
   color: var(--bad) !important;
   font-size: 13px;
 }
+.purse-block--stale {
+  color: var(--gold);
+}
+.purse-block--stale .live-dot {
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+}

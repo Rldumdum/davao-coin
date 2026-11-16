@@ -2,25 +2,43 @@
 //   (in contracts/) anvil --port 8546  &&  forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8546 --broadcast
 //   PLAYTEST_RPC=http://127.0.0.1:8546 node scripts/playtest.mjs
 // It mines and trades for real, so point it at a throwaway chain, not the one you play on.
+//
+// Live mode: PLAYTEST_URL=https://davao-coin.vercel.app node scripts/playtest.mjs
+// plays the deployed site as a brand-new visitor (spends one faucet drip of testnet ETH).
 import { createServer } from 'vite';
 import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const OUT = process.env.PLAYTEST_OUT ?? 'playtest';
-// Both the browser (VITE_RPC_URL) and the dev API (RPC_URL) must point at the throwaway chain.
-process.env.VITE_RPC_URL = process.env.RPC_URL = process.env.PLAYTEST_RPC ?? 'http://127.0.0.1:8546';
+const LIVE = process.env.PLAYTEST_URL;
+// Real networks confirm in seconds, not instantly like anvil: give transactions longer.
+const SLOW = LIVE ? 4 : 1;
 await mkdir(`${OUT}/shots`, { recursive: true });
 
-const server = await createServer({ server: { port: 5193, strictPort: true }, logLevel: 'error' });
-await server.listen();
-const url = server.resolvedUrls.local[0];
+let server = null;
+let url = LIVE;
+if (!LIVE) {
+  // Both the browser (VITE_RPC_URL) and the dev API (RPC_URL) must point at the throwaway chain.
+  process.env.VITE_RPC_URL = process.env.RPC_URL = process.env.PLAYTEST_RPC ?? 'http://127.0.0.1:8546';
+  server = await createServer({ server: { port: 5193, strictPort: true }, logLevel: 'error' });
+  await server.listen();
+  url = server.resolvedUrls.local[0];
+}
 
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const page = await browser.newPage({ viewport: { width: 1440, height: 860 } });
 const errors = [];
 page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
 page.on('pageerror', (e) => errors.push(String(e)));
-const report = { steps: [], errors };
+// Console errors don't say WHICH request failed; record status + URL (path only, no query).
+const failedRequests = {};
+page.on('response', (r) => {
+  if (r.status() < 400) return;
+  const u = new URL(r.url());
+  const key = `${r.status()} ${r.request().method()} ${u.host}${u.pathname}`;
+  failedRequests[key] = (failedRequests[key] ?? 0) + 1;
+});
+const report = { steps: [], errors, failedRequests };
 
 const shot = async (name, note) => {
   await page.screenshot({ path: `${OUT}/shots/${name}.png` });
@@ -43,9 +61,11 @@ const shot = async (name, note) => {
   console.log(name, JSON.stringify(s));
 };
 const wait = (ms) => page.waitForTimeout(ms);
+/** Waits that cover a blockchain transaction; stretched on live networks. */
+const txWait = (ms) => page.waitForTimeout(ms * SLOW);
 // Software rendering runs at a few fps, so fast-forward the simulation instead of waiting.
 const ff = (sec) => page.evaluate((s) => window.__game.game.advance(s), sec);
-const minedAtLeast = (n) => page.waitForFunction((n) => window.__game.state()?.timesMined >= n, n, { timeout: 30000 });
+const minedAtLeast = (n) => page.waitForFunction((n) => window.__game.state()?.timesMined >= n, n, { timeout: 30000 * SLOW });
 const tp = (x, z, heading) =>
   page.evaluate(([x, z, h]) => {
     window.__game.game.teleport(x, z, h);
@@ -53,7 +73,8 @@ const tp = (x, z, heading) =>
   }, [x, z, heading]);
 
 await page.goto(url);
-await page.getByRole('button', { name: 'Play' }).waitFor({ timeout: 60000 });
+// The Play button enables once the game server has registered the session (and the faucet drip confirmed).
+await page.getByRole('button', { name: 'Play' }).and(page.locator(':not([disabled])')).waitFor({ timeout: 90000 });
 await wait(1500);
 await shot('01-title', 'title screen over the world');
 await page.getByRole('button', { name: 'Play' }).click();
@@ -105,7 +126,7 @@ await page.getByRole('button', { name: 'Accept' }).click();
 await wait(300);
 await shot('10-trade-confirm', 'confirm step');
 await page.getByRole('button', { name: 'Confirm trade' }).click();
-await wait(3000);
+await txWait(3000);
 await shot('11-trade-done', 'trade complete');
 await page.keyboard.press('Escape');
 await wait(300);
@@ -121,11 +142,11 @@ await wait(200);
 await shot('12-nena', 'buying a durian');
 await page.getByRole('button', { name: 'Accept' }).click();
 await page.getByRole('button', { name: 'Confirm trade' }).click();
-await wait(3500);
+await txWait(3500);
 await page.keyboard.press('Escape');
 await wait(300);
 await page.keyboard.press('1');
-await wait(2500);
+await txWait(2500);
 await page.keyboard.press('i');
 await wait(500);
 await shot('13-bag', 'bag open after eating');
@@ -139,6 +160,7 @@ await wait(800);
 await shot('14-jun', 'money changer with ETH fields');
 
 await writeFile(`${OUT}/report.json`, JSON.stringify(report, null, 2));
-console.log('errors', errors);
+console.log('failed requests', failedRequests);
+console.log('console errors', errors.length, errors.filter((e) => !e.startsWith('Failed to load resource')).slice(0, 10));
 await browser.close();
-await server.close();
+await server?.close();

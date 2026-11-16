@@ -86,7 +86,7 @@ function Bar({ kind, label, value, max, text }: { kind: string; label: string; v
 
 /* --------------------------------------------------------- currencies */
 
-export function Purse({ durian, eth, block, flash }: { durian: bigint; eth: bigint; block: bigint; flash: boolean }) {
+export function Purse({ durian, eth, block, flash, stale = false }: { durian: bigint; eth: bigint; block: bigint; flash: boolean; stale?: boolean }) {
   return (
     <section className={`hud-purse ${flash ? 'hud-purse--flash' : ''}`} aria-label="Wallet">
       <div className="purse-row">
@@ -99,8 +99,8 @@ export function Purse({ durian, eth, block, flash }: { durian: bigint; eth: bigi
         <span className="purse-row__amt">{formatEth(eth)}</span>
         <span className="purse-row__sym">ETH</span>
       </div>
-      <div className="purse-block">
-        <span className="live-dot" /> block {block.toString()}
+      <div className={`purse-block ${stale ? 'purse-block--stale' : ''}`} title={stale ? 'The last chain read failed; retrying' : 'Live'}>
+        <span className="live-dot" /> {stale ? 'reconnecting…' : `block ${block.toString()}`}
       </div>
     </section>
   );
